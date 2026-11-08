@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f4f1eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Моё состояние">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./styles.css">
+  <title>Моё состояние</title>
+</head>
+<body>
+  <header class="top">
+    <div>
+      <p class="eyebrow">ЛИЧНЫЙ ДНЕВНИК НАБЛЮДЕНИЙ</p>
+      <h1>Моё состояние</h1>
+    </div>
+    <div class="top-right"><div class="lang-switch" aria-label="Language"><button type="button" data-lang="ru" class="active">RU</button><button type="button" data-lang="pl">PL</button><button type="button" data-lang="en">EN</button></div></div>
+  </header>
+
+  <nav class="tabs" aria-label="Разделы">
+    <button class="tab active" data-view="home">Главная</button>
+    <button class="tab" data-view="mood">Настроение</button>
+    <button class="tab" data-view="sleep">Сон</button>
+    <button class="tab" data-view="cycle">Цикл</button>
+    <button class="tab" data-view="meds">Лекарства</button>
+    <button class="tab" data-view="diary">Дневник</button>
+    <button class="tab" data-view="criticality">Идеи</button>
+    <button class="tab" data-view="goals">Цели</button>
+    <button class="tab" data-view="proscons">Плюсы и минусы</button>
+    <button class="tab" data-view="lists">Списки</button>
+    <button class="tab" data-view="personality">Фазы</button>
+    <button class="tab" data-view="export">Экспорт</button>
+  </nav>
+
+  <main>
+    <section class="view active" id="view-home">
+      <h2>Сегодня</h2>
+      <div class="panel home-mood-panel">
+        <h3>Оценка настроения</h3>
+        <label>Оценка: <strong id="home-mood-value">3 · нормально</strong>
+          <input id="home-mood-range" type="range" min="0" max="5" value="3">
+        </label>
+        <button type="button" class="primary" id="home-mood-save">Сохранить оценку</button>
+        <button type="button" class="secondary" data-go="mood">Открыть раздел «Настроение»</button>
+      </div>
+      <div class="panel">
+        <h3>Отметки приёма лекарств</h3>
+        <p class="small muted">Быстрая отметка за сегодня. Данные автоматически появятся в разделе «Лекарства».</p>
+        <div id="home-med-checks" class="stack">Препаратов пока нет.</div>
+      </div>
+      <div class="panel home-cycle-panel">
+        <h3>Менструальный цикл</h3>
+        <div id="home-cycle-info" class="stack small">Пока недостаточно данных.</div>
+        <button type="button" class="secondary" data-go="cycle">Открыть календарь цикла</button>
+      </div>
+      <section class="panel home-planner">
+        <h3>Календарь планов</h3>
+        <div class="planner-calendar-head"><button type="button" class="secondary" id="planner-prev" aria-label="Предыдущий месяц">‹</button><strong id="planner-month"></strong><button type="button" class="secondary" id="planner-next" aria-label="Следующий месяц">›</button></div>
+        <div id="planner-calendar" class="planner-calendar"></div>
+        <p class="small muted">Нажми на день, чтобы посмотреть запланированные списки.</p>
+      </section>
+      <div id="planner-day-modal" class="planner-modal" hidden><div class="planner-modal-card"><div class="planner-modal-head"><h3 id="planner-day-title">Планы на день</h3><button type="button" class="secondary" id="planner-day-close">Закрыть</button></div><div id="planner-day-content"></div></div></div>
+      <p class="muted">Данные сохраняются на этом устройстве. Интернет для ведения записей не нужен.</p>
+      <details class="panel section-picker">
+        <summary>Настроить разделы в верхнем меню</summary>
+        <p class="small muted">Отметь разделы, которые должны отображаться в верхнем меню.</p>
+        <div class="section-picker-list">
+          <label class="pin-check"><input type="checkbox" data-pin="mood" checked> Настроение</label>
+          <label class="pin-check"><input type="checkbox" data-pin="sleep" checked> Сон</label>
+          <label class="pin-check"><input type="checkbox" data-pin="cycle" checked> Цикл</label>
+          <label class="pin-check"><input type="checkbox" data-pin="meds" checked> Лекарства</label>
+          <label class="pin-check"><input type="checkbox" data-pin="diary" checked> Дневник</label>
+          <label class="pin-check"><input type="checkbox" data-pin="criticality" checked> Идеи</label>
+          <label class="pin-check"><input type="checkbox" data-pin="goals" checked> Цели</label>
+          <label class="pin-check"><input type="checkbox" data-pin="personality" checked> Фазы</label>
+          <label class="pin-check"><input type="checkbox" data-pin="proscons" checked> Плюсы и минусы</label>
+          <label class="pin-check"><input type="checkbox" data-pin="lists" checked> Списки</label>
+        </div>
+      </details>
+      <section class="panel contacts-panel">
+        <h3>Экстренные контакты</h3>
+        <p class="small muted">Нажатие на номер откроет приложение телефона с предложением позвонить.</p>
+        <div id="emergency-contacts" class="contacts-list"></div>
+        <button type="button" class="secondary contact-add" id="add-contact">＋ Добавить контакт</button>
+      </section>
+      <p class="small muted">Важно: это инструмент личного наблюдения, а не средство диагностики или автоматического определения фазы.</p>
+    </section>
+
+    <section class="view" id="view-meds">
+      <h2>Лекарства</h2>
+      <form id="med-form" class="panel">
+        <h3>Добавить препарат</h3>
+        <label>Название<input name="name" required placeholder="Название препарата"></label>
+        <label>Дозировка одного приёма (мг)<input name="doseMg" type="number" min="0" step="any" required placeholder="Например, 200"></label>
+        <label>Сколько раз в день
+          <select name="timesPerDay" id="times-per-day"><option value="1">1 раз</option><option value="2">2 раза</option><option value="3">3 раза</option></select>
+        </label>
+        <fieldset>
+          <legend>Периоды приёма</legend>
+          <div class="dose-grid">
+            <label class="inline"><input type="checkbox" name="period" value="Утро" checked> Утро</label>
+            <label class="inline"><input type="checkbox" name="period" value="Обед"> Обед</label>
+            <label class="inline"><input type="checkbox" name="period" value="Вечер"> Вечер</label>
+          </div>
+
+        </fieldset>
+        <label>Периодичность
+          <select name="frequency"><option value="Ежедневно">Ежедневно</option><option value="По выбранным дням">По выбранным дням</option><option value="Раз в неделю">Раз в неделю</option></select>
+        </label>
+        <label>Дни недели (если нужно)<input name="days" placeholder="Например: Пн, Ср, Пт"></label>
+        <button class="primary">Сохранить препарат</button>
+      </form>
+      <div id="med-list" class="stack"></div>
+      <p class="small muted">Отметки приёма ведутся отдельно для каждого периода и даты.</p>
+    </section>
+
+    <section class="view" id="view-mood">
+      <h2>Настроение</h2>
+      <form id="mood-form" class="panel">
+        <label>Дата и время<input name="date" type="datetime-local" required></label>
+        <label>Оценка настроения: <strong id="mood-value">3 · нормально</strong>
+          <input name="score" type="range" min="0" max="5" value="3" id="mood-range">
+        </label>
+        <div class="scale"><span>0 · пропасть</span><span>5 · слишком хорошо</span></div>
+        <label>Гипервоодушевление: <strong id="enth-value">0 · нет</strong><input name="enthusiasm" id="enth-range" type="range" min="0" max="2" step="1" value="0"></label>
+        <label>Раздражительность: <strong id="irrit-value">0 · нет</strong><input name="irritability" id="irrit-range" type="range" min="0" max="2" step="1" value="0"></label>
+        <label>Пустота: <strong id="empty-value">0 · нет</strong><input name="emptiness" id="empty-range" type="range" min="0" max="2" step="1" value="0"></label>
+        <label>Предполагаемая фаза
+          <select name="phase"><option value="">Не указана</option><option>Депрессивная</option><option>Смешанная</option><option>Ремиссия</option><option>Гипоманиакальная</option><option>Маниакальная</option></select>
+        </label>
+        <div id="mood-custom-fields"></div>
+        <button type="button" class="secondary mood-add-indicator" id="add-mood-indicator">＋ Добавить показатель</button>
+        <label>Общий комментарий<textarea name="note" rows="3" placeholder="Дополнительные наблюдения"></textarea></label>
+        <button class="primary">Сохранить общую оценку</button>
+      </form>
+      <div id="mood-list" class="stack"></div>
+    </section>
+
+
+
+    <section class="view" id="view-cycle">
+      <h2>Менструальный цикл</h2>
+      <div class="panel cycle-summary">
+        <h3>Прогноз следующей менструации</h3>
+        <div id="cycle-next" class="cycle-next">Пока недостаточно данных</div>
+        <div id="cycle-status" class="cycle-status stack small">
+          <p>Регулярность: пока недостаточно данных.</p><p>День цикла: пока не определён.</p><p>Задержка: нет данных.</p>
+        </div>
+        <p id="cycle-stats" class="small muted">Отмечай первый день менструации, чтобы приложение рассчитало среднюю длину цикла.</p>
+        <p class="small muted">Прогноз и вероятность зачатия ориентировочные. Овуляция может смещаться. Календарь не является методом контрацепции.</p>
+      </div>
+      <div class="panel" id="cycle-day-modal" hidden>
+        <div class="calendar-head"><strong>День · <span id="cycle-day-date"></span></strong><button type="button" class="secondary calendar-nav" id="cycle-day-close">×</button></div>
+        <div class="entry"><b>Вероятность забеременеть</b><p id="cycle-fertility-label"></p><p id="cycle-fertility-detail" class="small muted"></p></div>
+        <form id="cycle-day-form">
+          <input type="hidden" name="date">
+          <label class="inline"><input type="checkbox" name="period"> Месячные (автоматически отметятся ещё 4 следующих дня)</label>
+          <fieldset><legend>Самочувствие (можно выбрать несколько)</legend>
+            <details class="cycle-symptom-dropdown"><summary id="cycle-symptom-summary">Выбрать показатели самочувствия</summary>
+              <div class="cycle-symptom-menu"><div id="cycle-symptom-options" class="stack"></div>
+                <div class="cycle-symptom-add"><input type="text" id="cycle-symptom-new" placeholder="Добавить свой показатель" maxlength="60"><button type="button" class="secondary" id="add-cycle-symptom">＋ Добавить</button></div>
+              </div>
+            </details>
+          </fieldset>
+          <fieldset><legend>Сексуальная активность</legend>
+            <label class="inline"><input type="checkbox" name="sex"> Секс</label>
+            <div id="cycle-protection-wrap"><label>Способ защиты<select name="protection"><option value="none">Без защиты</option><option value="withdrawal">Прерванный половой акт (ППА)</option><option value="condom">Презерватив</option><option value="pills">Противозачаточные таблетки</option><option value="other">Другое</option></select></label></div>
+            <label class="inline"><input type="checkbox" name="masturbation"> Мастурбация</label>
+          </fieldset>
+          <label>Комментарий (необязательно)<textarea name="note" rows="2"></textarea></label>
+          <button class="primary">Сохранить день</button>
+        </form>
+      </div>
+      <div class="panel">
+        <div class="calendar-head"><button type="button" class="secondary calendar-nav" id="cycle-prev">‹</button><strong id="cycle-month"></strong><button type="button" class="secondary calendar-nav" id="cycle-next-month">›</button></div>
+        <div class="calendar-grid calendar-weekdays"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span></div>
+        <div id="cycle-calendar" class="calendar-grid"></div>
+        <div class="cycle-legend"><span><i class="legend-dot actual"></i> Месячные</span><span><i class="legend-dot predicted"></i> Прогноз</span><span><i class="legend-dot ovulation"></i> Овуляция*</span><span><i class="legend-dot sex"></i> Секс</span><span><i class="legend-dot masturbation"></i> Мастурбация</span></div>
+        <p class="small muted">Нажми на любой день, чтобы открыть его карточку и внести отметки.</p>
+      </div>
+    </section>
+
+    <section class="view" id="view-sleep">
+      <h2>Сон</h2>
+      <form id="sleep-form" class="panel">
+        <label>Дата пробуждения<input name="date" type="date" required></label>
+        <div class="two">
+          <label>Время отхода ко сну<input name="bed" type="time" value="23:00" required></label>
+          <label>Время пробуждения<input name="wake" type="time" value="07:00" required></label>
+        </div>
+        <fieldset>
+          <legend>Было ли ночное пробуждение?</legend>
+          <label class="inline"><input type="radio" name="woke" value="no" checked> Нет</label>
+          <label class="inline"><input type="radio" name="woke" value="yes"> Да</label>
+          <div id="wake-times-wrap" hidden>
+            <label>Интервалы ночного пробуждения
+              <div id="wake-times" class="wake-times"></div>
+            </label>
+            <button type="button" class="secondary" id="add-wake">+ Добавить интервал</button>
+          </div>
+        </fieldset>
+        <label>Описание сна<textarea name="dream" rows="4" placeholder="Содержание и впечатления от сна"></textarea></label>
+        <button class="primary">Сохранить сон</button>
+      </form>
+      <div id="sleep-list" class="stack"></div>
+    </section>
+
+    <section class="view" id="view-diary">
+      <h2>Дневник</h2>
+      <form id="diary-form" class="panel">
+        <label>Дата и время<input name="date" type="datetime-local" required></label>
+        <label>Мысли, события и чувства<textarea name="body" rows="7" placeholder="Новая запись..." ></textarea></label>
+        <button class="primary">Сохранить запись</button>
+      </form>
+      <div class="panel">
+        <h3>Поиск записей по датам</h3>
+        <div class="two">
+          <label>С даты<input type="date" id="diary-from"></label>
+          <label>По дату<input type="date" id="diary-to"></label>
+        </div>
+        <button class="secondary" id="diary-filter">Применить фильтр</button>
+        <button class="text-button" id="diary-clear">Сбросить</button>
+      </div>
+      <div id="diary-list" class="stack"></div>
+    </section>
+
+    <section class="view" id="view-personality">
+      <h2>Конструктор фаз</h2>
+      <p class="muted">Заполняй собственные наблюдения. Это не фиксированные характеристики и не автоматическая оценка состояния.</p>
+      <form id="trait-form" class="panel">
+        <h3>Добавить сферу</h3>
+        <label>Сфера или тема<input name="topic" required placeholder="Например, планы на будущее"></label>
+        <label>Депрессивная фаза<textarea name="depression" rows="2"></textarea></label>
+        <label>Смешанное состояние<textarea name="mixed" rows="2"></textarea></label>
+        <label>Ремиссия<textarea name="remission" rows="2"></textarea></label>
+        <label>Гипоманиакальная фаза<textarea name="hypomania" rows="2"></textarea></label>
+        <label>Маниакальная фаза<textarea name="mania" rows="2"></textarea></label>
+        <button class="primary">Добавить строку</button>
+      </form>
+      <div id="trait-list" class="stack"></div>
+    </section>
+
+    <section class="view" id="view-criticality">
+      <h2>Идеи</h2>
+      <p class="muted">Фиксация идей и последующая оценка решений с учётом предполагаемой фазы на дату создания.</p>
+      <form id="idea-form" class="panel">
+        <h3>Новая идея</h3>
+        <label>Идея или план<textarea name="idea" rows="5" required placeholder="Опиши идею"></textarea></label>
+        <label>Дата и время создания<input name="date" type="datetime-local" required></label>
+        <p class="assessment-prompt">Оценка адекватности реализации</p>
+        <label>Оценка (рекомендуется проводить только в фазе ремиссии)<select name="assessment"><option value="">Пока не оценивалась</option><option value="reasonable">Адекватная</option><option value="questionable">Сомнительная</option><option value="unreasonable">Неадекватная</option><option value="defer">Отложить до повторной оценки</option></select></label>
+        <button class="primary">Сохранить идею</button>
+      </form>
+      <div id="idea-list" class="stack"></div>
+    </section>
+    <section class="view" id="view-goals">
+      <h2>Цели</h2>
+      <p class="muted">Здесь отображаются идеи с оценкой «Адекватная». Также можно создавать самостоятельные цели без связи с идеями.</p>
+      <form id="standalone-goal-form" class="panel">
+        <h3>Новая самостоятельная цель</h3>
+        <label>Название цели<input name="title" required placeholder="Например, выучить польский"></label>
+        <label>Валюта цели<select name="currency"><option value="EUR">EUR (€)</option><option value="PLN">PLN (zł)</option><option value="RUB">RUB (₽)</option></select></label>
+        <button class="primary">Добавить цель</button>
+      </form>
+      <div id="goals-list" class="stack"></div>
+    </section>
+    <section class="view" id="view-proscons">
+      <h2>Плюсы и минусы</h2>
+      <form id="proscons-form" class="panel"><h3>Создать тему</h3><label>Название темы<input name="title" required placeholder="Например, текущая работа"></label><button class="primary" type="submit">＋ Создать тему</button></form>
+      <div id="proscons-list" class="stack"></div>
+    </section>
+    <section class="view" id="view-lists">
+      <h2>Списки</h2>
+      <form id="planner-list-form" class="panel"><h3>Создать список</h3><label>Название списка<input name="title" required placeholder="Например, список дел"></label><label>Дата исполнения<input name="due" type="date"></label><button class="primary" type="submit">＋ Создать список</button></form>
+      <div id="planner-lists" class="stack"></div>
+    </section>
+    <section class="view" id="view-export">
+      <h2>Экспорт и резервная копия</h2>
+      <p class="muted">Файлы формируются на устройстве. Общая книга сохраняется в формате Excel XML (.xls) с отдельным листом для каждого раздела. Резервную копию JSON можно скачать и позже восстановить.</p>
+      <div class="panel stack">
+        <button class="export-btn" data-export="meds">Выгрузить лекарства (.csv)</button>
+        <button class="export-btn" data-export="mood">Выгрузить настроение (.csv)</button>
+        <button class="export-btn" data-export="sleep">Выгрузить сон (.csv)</button>
+        <button class="export-btn" data-export="cycle">Выгрузить цикл (.csv)</button>
+        <button class="export-btn" data-export="diary">Выгрузить дневник и сны (.csv)</button>
+        <button class="export-btn" data-export="traits">Выгрузить конструкт фаз (.csv)</button>
+        <button class="export-btn" data-export="criticality">Выгрузить идеи (.csv)</button>
+        <button class="export-btn" data-export="goals">Выгрузить цели (.csv)</button>
+        <button class="primary" id="export-all">Выгрузить всё одним файлом Excel</button>
+        <button class="primary" id="backup">Скачать резервную копию всех данных (.json)</button>
+        <label class="secondary file-label">Восстановить данные из резервной копии (.json)<input type="file" id="restore-backup" accept="application/json,.json"></label>
+      </div>
+      <p id="export-status" class="small muted" aria-live="polite"></p>
+    </section>
+  </main>
+  <footer>Локальное приложение · данные не отправляются на сервер</footer>
+  <div id="consent-overlay" class="consent-overlay" hidden>
+    <section class="consent-dialog" role="dialog" aria-modal="true" aria-labelledby="consent-title">
+      <div class="lang-switch consent-lang"><button type="button" data-lang="ru" class="active">RU</button><button type="button" data-lang="pl">PL</button><button type="button" data-lang="en">EN</button></div>
+      <h2 id="consent-title">Подтверждение возраста и условия использования</h2>
+      <p><strong>Только для лиц старше 18 лет.</strong> Подтвердите, что вам исполнилось 18 лет.</p>
+      <div class="policy-copy">
+        <p><strong>Назначение.</strong> Приложение предназначено исключительно для личного ведения дневника и наблюдения за собственными привычками, настроением, сном и приёмом лекарств.</p>
+        <p><strong>Не медицинское средство.</strong> Приложение не является медицинским изделием, не ставит диагнозы, не определяет фазы заболевания, не назначает и не корректирует лечение. Записи и графики не заменяют профессиональную медицинскую оценку.</p>
+        <p><strong>Ответственность пользователя.</strong> Пользователь самостоятельно проверяет точность введённых данных, принимает решения о своём здоровье и не должен менять или прекращать лечение на основании приложения.</p>
+        <p><strong>Хранение данных.</strong> Данные хранятся локально в браузере на устройстве. Разработчик приложения не получает к ним доступ через сайт. Пользователь отвечает за сохранность устройства и резервных копий. Очистка данных браузера, удаление приложения или сбой устройства могут привести к потере записей.</p>
+        <p><strong>Отсутствие гарантий.</strong> Приложение предоставляется «как есть». Не гарантируются бесперебойная работа, отсутствие ошибок или сохранность данных. В пределах, допускаемых применимым законодательством, разработчик не отвечает за косвенные убытки и последствия решений, принятых пользователем на основании записей. Эти условия не ограничивают права, от которых нельзя отказаться по закону.</p>
+        <p><strong>Добровольное использование.</strong> Продолжая использование, пользователь подтверждает, что понял назначение и ограничения приложения.</p>
+      </div>
+      <label class="consent-check"><input type="checkbox" id="age-confirm"> Мне исполнилось 18 лет.</label>
+      <label class="consent-check"><input type="checkbox" id="policy-confirm"> Я прочитал(а) и принимаю условия использования.</label>
+      <button id="consent-accept" class="primary" disabled>Подтвердить и продолжить</button>
+    </section>
+  </div>
+  <script src="./app.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(console.error));
+    }
+  </script>
+</body>
+</html>
