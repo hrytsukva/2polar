@@ -1,0 +1,11 @@
+{
+  "name": "Моё состояние",
+  "short_name": "Состояние",
+  "lang": "ru",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f1eb",
+  "theme_color": "#f4f1eb",
+  "description": "Личный офлайн-дневник наблюдений"
+}
